@@ -377,7 +377,6 @@ class Template(list):
         tpl.append(TemplateText(body[start:]))  # leftover
         return tpl
 
-
     def subst(self, params, extractor, depth=0):
         # We perform parameter substitutions recursively.
         # We also limit the maximum number of iterations to avoid too long or
@@ -407,7 +406,6 @@ class Template(list):
 
 class TemplateText(text_type):
     """Fixed text of template"""
-
 
     def subst(self, params, extractor, depth):
         return self
@@ -445,7 +443,6 @@ class TemplateArg(object):
         else:
             return '{{{%s}}}' % self.name
 
-
     def subst(self, params, extractor, depth):
         """
         Substitute value for this argument from dict :param params:
@@ -468,7 +465,9 @@ class TemplateArg(object):
 
 class Frame(object):
 
-    def __init__(self, title='', args=[], prev=None):
+    def __init__(self, title='', args=None, prev=None):
+        if args is None:
+            args = []
         self.title = title
         self.args = args
         self.prev = prev
@@ -1250,7 +1249,7 @@ def findMatchingBraces(text, ldelim=0):
                 cur = end
 
 
-def findBalanced(text, openDelim=['[['], closeDelim=[']]']):
+def findBalanced(text, openDelim=None, closeDelim=None):
     """
     Assuming that text contains a properly balanced expression using
     :param openDelim: as opening delimiters and
@@ -1258,6 +1257,10 @@ def findBalanced(text, openDelim=['[['], closeDelim=[']]']):
     :return: an iterator producing pairs (start, end) of start and end
     positions in text containing a balanced expression.
     """
+    if closeDelim is None:
+        closeDelim = [']]']
+    if openDelim is None:
+        openDelim = ['[[']
     openPat = '|'.join([re.escape(x) for x in openDelim])
     # pattern for delimiters expected after each opening delimiter
     afterPat = {o: re.compile(openPat + '|' + c, re.DOTALL) for o, c in zip(openDelim, closeDelim)}
